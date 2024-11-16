@@ -116,7 +116,7 @@ export class LikeService {
         where: { competition: { id: addLikeDto.competitionId } },
       });
 
-      if (totalLikes >= 30 && !competition.end_date) {
+      if (totalLikes >= 1 && !competition.end_date) {
         await this.competitionService.endCompetition(addLikeDto.competitionId);
       }
 

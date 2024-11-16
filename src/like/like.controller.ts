@@ -6,6 +6,7 @@ import {
   Param,
   ParseIntPipe,
   Query,
+  BadRequestException,
 } from '@nestjs/common';
 import { LikeService } from './like.service';
 import { Like } from './like.entity';
@@ -39,9 +40,16 @@ export class LikeController {
   @Get('competition/:competitionId')
   async getLikesForCompetition(
     @Param('competitionId', ParseIntPipe) competitionId: number,
-    @Query('toUserId', ParseIntPipe) toUserId?: number,
+    @Query('toUserId') toUserId?: string,
   ): Promise<Like[]> {
-    return this.likeService.getLikesForCompetition(competitionId, toUserId);
+    const parsedToUserId = toUserId ? parseInt(toUserId, 10) : undefined;
+    if (toUserId && isNaN(parsedToUserId)) {
+      throw new BadRequestException('toUserId must be a number');
+    }
+    return this.likeService.getLikesForCompetition(
+      competitionId,
+      parsedToUserId,
+    );
   }
 
   /**
