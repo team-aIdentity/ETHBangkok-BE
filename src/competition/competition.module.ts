@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { CompetitionService } from './competition.service';
 import { CompetitionController } from './competition.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -8,8 +8,12 @@ import { User } from 'src/user/user.entity';
 import { LikeModule } from 'src/like/like.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Competition, User]), LikeModule],
+  imports: [
+    TypeOrmModule.forFeature([Competition, User]),
+    forwardRef(() => LikeModule),
+  ],
   providers: [CompetitionService, QueueService],
   controllers: [CompetitionController],
+  exports: [CompetitionService],
 })
 export class CompetitionModule {}

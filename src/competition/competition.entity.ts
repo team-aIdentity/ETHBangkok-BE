@@ -28,6 +28,9 @@ export class Competition {
   @ManyToOne(() => User, (user) => user.winningCompetitions, { nullable: true })
   winner?: User;
 
+  /**
+   * 해당 컴피티션에 속한 좋아요
+   */
   @OneToMany(() => Like, (like) => like.competition)
   likes: Like[];
 }

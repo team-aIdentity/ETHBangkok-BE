@@ -43,6 +43,15 @@ export class User {
   @OneToMany(() => Competition, (competition) => competition.winner)
   winningCompetitions: Competition[];
 
-  @OneToMany(() => Like, (like) => like.user)
-  likes: Like[];
+  /**
+   * 유저가 다른 유저에게 준 좋아요
+   */
+  @OneToMany(() => Like, (like) => like.fromUser)
+  likesGiven: Like[];
+
+  /**
+   * 유저가 다른 유저로부터 받은 좋아요
+   */
+  @OneToMany(() => Like, (like) => like.toUser)
+  likesReceived: Like[];
 }

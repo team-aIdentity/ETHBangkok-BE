@@ -16,11 +16,16 @@ export class CompetitionService {
   ) {}
 
   findAll(): Promise<Competition[]> {
-    return this.competitionsRepository.find();
+    return this.competitionsRepository.find({
+      relations: ['users', 'winner', 'likes'],
+    });
   }
 
   findOne(id: number): Promise<Competition> {
-    return this.competitionsRepository.findOneBy({ id });
+    return this.competitionsRepository.findOne({
+      where: { id },
+      relations: ['users', 'winner', 'likes'],
+    });
   }
 
   async create(
@@ -53,7 +58,7 @@ export class CompetitionService {
     });
 
     if (!existingCompetition) {
-      throw new Error(`Compeition with ID ${id} not found`);
+      throw new NotFoundException(`Competition with ID ${id} not found`);
     }
 
     return this.competitionsRepository.save(existingCompetition);
@@ -62,7 +67,7 @@ export class CompetitionService {
   async remove(id: number): Promise<void> {
     const result = await this.competitionsRepository.delete(id);
     if (result.affected == 0) {
-      throw new Error(`Compeptition with ID ${id} not found`);
+      throw new NotFoundException(`Competition with ID ${id} not found`);
     }
   }
 
@@ -80,6 +85,10 @@ export class CompetitionService {
     return this.create(competitionData);
   }
 
+  /**
+   * 컴피티션을 종료하고 우승자를 선정합니다.
+   * @param competitionId 컴피티션 ID
+   */
   async endCompetition(competitionId: number): Promise<Competition> {
     const competition = await this.competitionsRepository.findOne({
       where: { id: competitionId },
@@ -96,10 +105,11 @@ export class CompetitionService {
       throw new NotFoundException('Competition has already ended.');
     }
 
+    // 각 참가자별 좋아요 수 집계
     const likeCounts: { [userId: number]: number } = {};
 
     competition.likes.forEach((like) => {
-      const userId = like.user.id;
+      const userId = like.toUser.id;
       if (likeCounts[userId]) {
         likeCounts[userId]++;
       } else {
@@ -107,7 +117,7 @@ export class CompetitionService {
       }
     });
 
-    // Determine the user with the most likes
+    // 가장 많은 좋아요를 받은 유저 찾기
     let winnerId: number | null = null;
     let maxLikes = -1;
 
@@ -118,13 +128,13 @@ export class CompetitionService {
       }
     }
 
-    // Assign winner
+    // 우승자 할당
     if (winnerId) {
       const winner = competition.users.find((user) => user.id === winnerId);
       competition.winner = winner;
     }
 
-    // Set end_date
+    // 종료일자 설정
     competition.end_date = new Date();
 
     return this.competitionsRepository.save(competition);

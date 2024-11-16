@@ -1,3 +1,4 @@
+import { Type } from 'class-transformer';
 import {
   ArrayMaxSize,
   ArrayMinSize,
@@ -7,6 +8,7 @@ import {
 } from 'class-validator';
 
 export class CreateCompetitionDto {
+  @Type(() => Date)
   @IsDate()
   start_date: Date;
 
