@@ -10,6 +10,8 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { Competition } from './competition/competition.entity';
 import { ConfigModule } from '@nestjs/config';
+import { LikeModule } from './like/like.module';
+import { Like } from './like/like.entity';
 
 @Module({
   imports: [
@@ -21,16 +23,18 @@ import { ConfigModule } from '@nestjs/config';
       username: process.env.POSTGRES_DB_USERNAME,
       password: process.env.POSTGRES_DB_PASSWORD,
       database: process.env.POSTGRES_DB_NAME,
-      entities: [User, Competition],
+      entities: [User, Competition, Like],
       synchronize: true,
     }),
     UserModule,
     CompetitionModule,
+    LikeModule,
     UploadModule,
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'uploads', 'images'),
       serveRoot: '/image',
     }),
+    LikeModule,
   ],
   controllers: [AppController],
   providers: [AppService],

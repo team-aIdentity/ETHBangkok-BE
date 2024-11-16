@@ -8,13 +8,18 @@ import {
   Param,
   NotFoundException,
   ParseIntPipe,
+  Patch,
 } from '@nestjs/common';
 import { CompetitionService } from './competition.service';
 import { Competition } from './competition.entity';
+import { QueueService } from './queue.service';
 
 @Controller('competition')
 export class CompetitionController {
-  constructor(private readonly competitionService: CompetitionService) {}
+  constructor(
+    private readonly competitionService: CompetitionService,
+    private readonly queueService: QueueService,
+  ) {}
 
   /**
    * Retrieve all competitions.
@@ -36,17 +41,6 @@ export class CompetitionController {
       throw new NotFoundException(`Competition with ID ${id} not found`);
     }
     return competition;
-  }
-
-  /**
-   * Create a new competition.
-   * POST /competition
-   */
-  @Post()
-  async create(
-    @Body() competitionData: Partial<Competition>,
-  ): Promise<Competition> {
-    return this.competitionService.create(competitionData);
   }
 
   /**
@@ -76,5 +70,28 @@ export class CompetitionController {
     } catch (error) {
       throw new NotFoundException(error.message);
     }
+  }
+
+  /**
+   * Add a user to the competition queue.
+   * POST /competition/join-queue
+   */
+  @Post('join-queue')
+  async joinQueue(
+    @Body('userId') userId: number,
+  ): Promise<{ message: string }> {
+    this.queueService.addToQueue(userId);
+    return { message: 'User added to the queue' };
+  }
+
+  /**
+   * End a competition by ID.
+   * PATCH /competition/:id/end
+   */
+  @Patch(':id/end')
+  async endCompetition(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<Competition> {
+    return this.competitionService.endCompetition(id);
   }
 }

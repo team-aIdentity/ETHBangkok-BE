@@ -1,4 +1,5 @@
 import { Competition } from 'src/competition/competition.entity';
+import { Like } from 'src/like/like.entity';
 import {
   Column,
   Entity,
@@ -41,4 +42,7 @@ export class User {
 
   @OneToMany(() => Competition, (competition) => competition.winner)
   winningCompetitions: Competition[];
+
+  @OneToMany(() => Like, (like) => like.user)
+  likes: Like[];
 }
