@@ -43,4 +43,19 @@ export class LikeController {
   ): Promise<Like[]> {
     return this.likeService.getLikesForCompetition(competitionId, toUserId);
   }
+
+  /**
+   * 특정 컴피티션의 특정 유저가 누른 좋아요를 조회합니다.
+   * GET /likes/competition/:competitionId/fromUserId/1
+   */
+  @Get('competition/:competitionId/fromUserId/:fromUserId')
+  async getLikeByCompetitionAndFromUser(
+    @Param('competitionId', ParseIntPipe) competitionId: number,
+    @Param('fromUserId', ParseIntPipe) fromUserId: number,
+  ): Promise<Like> {
+    return this.likeService.getLikeByCompetitionAndFromUser(
+      competitionId,
+      fromUserId,
+    );
+  }
 }

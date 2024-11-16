@@ -144,4 +144,25 @@ export class LikeService {
       });
     });
   }
+
+  /**
+   * 특정 컴피티션에서 특정 유저가 누를 좋아요를 조회 합니다.
+   * @param competitionId 컴피티션 ID
+   * @param fromUserId 종아요를 누른 유저 ID (옵션)
+   */
+  async getLikeByCompetitionAndFromUser(
+    competitionId: number,
+    fromUserId: number,
+  ): Promise<Like | null> {
+    return await this.dataSource.transaction(async (manager) => {
+      const where: any = {
+        competition: { id: competitionId },
+        fromUser: { id: fromUserId },
+      };
+      return manager.findOne(Like, {
+        where,
+        relations: ['fromUser', 'toUser'],
+      });
+    });
+  }
 }
