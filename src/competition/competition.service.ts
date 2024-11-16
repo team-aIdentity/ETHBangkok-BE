@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository } from 'typeorm';
+import { DataSource, In, Repository } from 'typeorm';
 import { Competition } from './competition.entity';
 import { User } from 'src/user/user.entity';
 import { CreateCompetitionDto } from './dto/create-competition.dto';
@@ -10,10 +10,15 @@ export class CompetitionService {
   constructor(
     @InjectRepository(Competition)
     private competitionsRepository: Repository<Competition>,
+    private dataSource: DataSource,
 
     @InjectRepository(User)
     private usersRepository: Repository<User>,
   ) {}
+
+  async onModuleInit() {
+    await Competition.createDummyCompetitions(this.dataSource);
+  }
 
   findAll(): Promise<Competition[]> {
     return this.competitionsRepository.find({

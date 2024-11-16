@@ -5,7 +5,14 @@ import { CompetitionService } from './competition.service';
 export class QueueService {
   private queue: number[] = [];
 
-  constructor(private readonly competitionService: CompetitionService) {}
+  constructor(private readonly competitionService: CompetitionService) {
+    this.initializeTestUsers();
+  }
+
+  private initializeTestUsers(): void {
+    const testUserIds = [9, 10, 11]; // 테스트용 사용자 ID
+    testUserIds.forEach((id) => this.addToQueue(id));
+  }
 
   addToQueue(userId: number): void {
     if (!this.queue.includes(userId)) {
